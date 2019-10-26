@@ -1,19 +1,39 @@
 import React, { setState, Component, useState } from 'react';
-import IndPlate from './IndPlate.js';
+//import IndPlate from './IndPlate.js';
 
 class Menumodal extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
-        completed: localStorage.getItem('completed') ? JSON.parse(localStorage.getItem('completed')) : [{comment: 'none'}],
+        completed: localStorage.getItem('completed') ? JSON.parse(localStorage.getItem('completed')) : [{key: 0, comment: 'none'}],
     }}
+
+  componentDidUpdate(prevState, props) {
+    if (localStorage.getItem('completed')) {
+    var updatedcomplete = JSON.parse(localStorage.getItem('completed'));
+    if (updatedcomplete.length !== this.state.completed.length){
+      this.setState({
+        completed: updatedcomplete,
+      })
+    }
+
+  }}
+
+  cleanplates = (e) => {
+    if (window.confirm("Are you sure you want to clean your plates? This will remove all saved data.")) {
+    localStorage.clear();
+
+  }}
+
+
 render() {
 
     return (
+      <>
       <div className="modal">
       <div className="tutorial">
-      <p>What's on your plate? <br/>  <br/> To-do lists aren't meant to live forever. Sticky notes are fleeting. Here your plates break for you. <br/> <br/>Plates are created using one of four levels of transience:</p>
+      <p>What's on your plate? <br/>  <br/> To-do lists aren't meant to live forever. Sticky notes are fleeting. These plates break for you. <br/> <br/>Plates are created using one of four levels of transience:</p>
 
       <div className="plateitem">
         <div className="buttons"><p>12</p></div>
@@ -42,7 +62,10 @@ render() {
               </span>
         </div>
 
-        <p>Plates are shelved in your browser's Local Storage only. They may be cleared by browser updates and can be <a href="https://www.ghacks.net/2015/02/05/how-to-clear-web-storage-in-your-browser-of-choice/">manually</a> deleted.</p>
+        <p>Plates are shelved in your browser's Local Storage only. They may occasionally be cleared by browser updates.</p>
+
+        <p className="cleanplates" onClick={this.cleanplates.bind(this)}>Clean Plates</p>
+
 
       </div>
 
@@ -70,7 +93,7 @@ render() {
         )}
         </div>
 
-    </div>)
+    </div></>)
 
 }
 }

@@ -1,22 +1,26 @@
 import React, { setState, Component, useState } from 'react';
-import IndPlate from './IndPlate.js';
-//import {form, ul, button, input} from './script.js';
-//import Buttons from './Buttons.js';
-//import Plates from "./test.js";
 
 class platesContain extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
-      Plates: localStorage.getItem('Plates') ? JSON.parse(localStorage.getItem('Plates')) : [{key: 0, time: false, comment: '', finished: false}],
+      Plates: localStorage.getItem('Plates') ? JSON.parse(localStorage.getItem('Plates')) : [{key: 0, time: 'false', comment: '', finished: false}],
       completed: localStorage.getItem('completed') ? JSON.parse(localStorage.getItem('completed')) : '',
-      //change: this.change.bind(this),
       handleFinshed: this.handleFinshed.bind(this),
       nowtime: Math.floor(Date.now() / 1000),
       color: '',
     };
   };
+
+
+  componentDidMount(state, props) {
+    this.interval = setInterval(() => this.setState({
+      nowtime: Math.floor(Date.now() / 1000),
+    }), 1000);
+    localStorage.setItem('maxcount', 0);
+    window.addEventListener("blur", this.onwindowBlur);
+  }
 
 //Plate Focused State
 onBlur = () => {
@@ -30,21 +34,13 @@ onFocus = () => {
 //Create New Plate Button
   handleNew = (event, state) => {
     var newkey = parseInt(localStorage.getItem('maxcount')) + 1;
-    console.log(newkey);
     this.setState({
       Plates: [
         ...this.state.Plates,
-        {key: newkey, time: false, comment: '', finished: false},
-      ]})
+        {key: newkey, time: 'false', comment: '', finished: false},
+      ]});
   window.scrollTo(0,document.body.scrollHeight);
-}
-
-componentDidMount(state, props) {
-  this.interval = setInterval(() => this.setState({
-    nowtime: Math.floor(Date.now() / 1000),
-  }), 1000);
-  localStorage.setItem('maxcount', 0);
-  window.addEventListener("blur", this.onwindowBlur)
+    console.log('make new????');
 }
 
 //Create New Plate Enter
@@ -58,11 +54,11 @@ handleKeyDown = (event, state) => {
         event.preventDefault();
         this.setState({ focused: false })
         var getcount = parseInt(localStorage.getItem('maxcount'));
-        var newkey = getcount + 1;
+      var newkey = parseInt(localStorage.getItem('maxcount')) + 1;
         this.setState({
           Plates: [
             ...this.state.Plates,
-            {key: newkey, time: false, comment: '', finished: false},
+            {key: newkey, time: 'false', comment: '', finished: false},
           ]})
     }
 };
@@ -84,36 +80,49 @@ onwindowBlur = () => {
     })
 }
 
-update = (e, id) => {
+update = (e, id, props) => {
     var newplate = this.state.Plates.slice();
     var currentcontent = e.target.textContent;
 
     var keepid = e.target.dataset.newid;
-    var keeptime = e.target.time;
+    var keeptime = e.target.dataset.newtime;
+    var timezone =
+    keeptime === 'false' ? (parseInt(this.state.nowtime) + parseInt(localStorage.getItem('active'))):
+    isNaN(keeptime) ? 'doom':
+    keeptime;
 
-    var timezone = (keeptime) ? keeptime :
-    (localStorage.getItem('active') === 'doom') ? 'doom':
-    (parseInt(this.state.nowtime) + parseInt(localStorage.getItem('active')));
     var keepkey = parseInt(e.target.dataset.newkey);
 
     newplate[keepid] = {key: keepkey, time: timezone, comment: currentcontent, finished: false};
-      console.log(newplate);
     this.setState({
       Plates: newplate
     })
 }
 
 //finish plate
-handleFinshed = (state, id ) => {
+handleFinshed = (e, id) => {
   var doneplate = this.state.Plates.slice()
-  console.log(doneplate[id].comment)
-  if (doneplate[id].comment) {
-  if (window.confirm("Did you finish \"" + doneplate[id].comment + "\"?" )) {
-    doneplate[id] = {key: doneplate[id].key, time: doneplate[id].time + 300, comment: doneplate[id].comment, finished: true}
+  var keepid = e.target.dataset.newid;
+  if (doneplate[keepid].time === 'doom') {
+  doneplate[keepid] = {key: doneplate[keepid].key, time: doneplate[keepid].time, comment: doneplate[keepid].comment, finished: true}
+  this.setState({
+    completed: [
+      ...this.state.completed,
+      doneplate[keepid]
+    ]}, () =>
+    localStorage.setItem('completed', JSON.stringify(this.state.completed))
+  )
+
+  this.setState({Plates: (doneplate)}, () =>
+      localStorage.setItem('Plates', JSON.stringify(this.state.Plates))
+)}
+  else if (doneplate[keepid].comment) {
+  if (window.confirm("Did you finish \"" + doneplate[keepid].comment + "\"?" )) {
+    doneplate[keepid] = {key: doneplate[keepid].key, time: doneplate[keepid].time, comment: doneplate[keepid].comment, finished: true}
     this.setState({
       completed: [
         ...this.state.completed,
-        doneplate[id]
+        doneplate[keepid]
       ]}, () =>
       localStorage.setItem('completed', JSON.stringify(this.state.completed))
     )
@@ -129,17 +138,16 @@ handleFinshed = (state, id ) => {
 componentDidUpdate(prevState, props) {
   var lengths = Object.keys(this.state.Plates);
   var maxlengths = Math.max(...lengths);
-  if (maxlengths >= localStorage.getItem('maxcount')){
+  if (maxlengths > localStorage.getItem('maxcount')){
   localStorage.setItem('maxcount', maxlengths)}
 
   var updatedplate = this.state.Plates.filter(x =>
-  x.time === 'doom' ? true :
-  x.time !== false ? x.time - this.state.nowtime > 0 : true);
-
-  localStorage.setItem('Plates', JSON.stringify(updatedplate))
-    console.log('storage:', updatedplate, 'state:', this.state.Plates);
+  isNaN(x.time) ? true:
+  (x.time - this.state.nowtime > 0) ? true : false);
+  //x.time !== 'false' ?
 
   if (updatedplate.length !== this.state.Plates.length){
+    localStorage.setItem('Plates', JSON.stringify(updatedplate))
     this.setState({
       Plates: updatedplate,
     })
@@ -168,6 +176,7 @@ render() {
     var m = Math.floor(((timeleft/3600) - h)*60);
     var s = Math.floor(((((timeleft/3600) - h)*60)- m)*60);
     return h +':'+ m +':'+ s;
+    // < (e) => this.handleFinshed(e, Plates.key)
   }
 
   return (
@@ -192,7 +201,8 @@ render() {
 
             <div className="plateitem">
               <div className="platebox">
-                <div className="plate" onClick={Plates.finished === false ? (e) => this.handleFinshed(e, Plates.key) : ''}>
+
+                <div className="plate" data-newid={id} onClick={Plates.finished === false ? this.handleFinshed.bind(this) : ''}>
                 </div>
               </div>
                   <span
@@ -203,10 +213,10 @@ render() {
                   + stringifyNumber(Plates.key)
                   + " Plate."}
                   onFocus={this.onFocus}
-                  data-newkey={Plates.key}
-                  data-newid={id}
+                  data-newkey = {Plates.key}
+                  data-newtime = {Plates.time}
+                  data-newid = {id}
                   onBlur={this.update.bind(this)}
-                //onChange={this.onScriptChange.bind(this)}
                   className={"platetext " + (Plates.finished ? "finished" : "")}
                   onKeyDown={this.handleKeyDown}
                   contentEditable={Plates.finished ? false : true}
@@ -216,7 +226,7 @@ render() {
                   <span className="timeleft">
                   { (Plates.finished === true) ? '🙌' :
                     (Plates.time === 'doom') ? '💥' :
-                    (Plates.time === false) ? '' :
+                    (Plates.time === 'false') ? '' :
                     Plates.time ? timeNumber(Plates.time, this.state.nowtime) : ''}
                   </span>
 

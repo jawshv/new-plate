@@ -9,7 +9,7 @@
   width: calc(100% - 60px);
   max-width: 600px;
   margin: auto;
-  margin-top: -22px;
+  margin-top: -30px;
 }
 
 .theplates {
@@ -33,9 +33,9 @@ h1 {
 }
 
 .plate {
-  width: 20px;
-  height: 20px;
-  border: solid black 2px;
+  width: 25px;
+  height: 25px;
+  border: solid black 1px;
   border-radius: 50%;
   margin-top: 0px;
   transition: .4s;
@@ -43,45 +43,51 @@ h1 {
 
 .plate:hover {
   cursor: pointer;
-  border: solid black 2px;
+  border: solid black 1px;
   transition: .3s;
+      box-shadow: 0 4px 8px 0 lightgrey;
 }
 
 .new {
-  width: 20px;
-  height: 20px;
-  border: solid grey 2px;
+  width: 25px;
+  height: 25px;
+  border: solid grey 1px;
   transition: .3s;
   color: grey;
   text-align: center;
-  line-height: 13.5pt;
+  line-height: 17pt;
+      transition: .3s;
 }
 
 .new:hover {
-    border: solid back 2px;
+    border: solid back 1px;
     color: black;
     cursor: pointer;
     transition: .3s;
+    box-shadow: 0 4px 8px 0 lightgrey;
 }
 
 .mainbuttons {
   position: fixed;
   right: 50px;
+      transition: .3s;
 }
 
 .buttons p:hover {
   cursor: pointer;
-  border: solid grey 2px;
-  color: grey;
+  box-shadow: 0 4px 8px 0 lightgrey;
+      transition: .3s;
+        border: solid black 1px;
+        color: black;
 }
 
 .buttons p {
   transform: scale(1);
-  width: 20px;
-  height: 20px;
-  border: solid black 2px;
-  color: black;
-  line-height: 14.5pt;
+  width: 25px;
+  height: 25px;
+  border: solid grey 1px;
+  color: grey;
+  line-height: 18pt;
   border-radius: 50%;
   margin-top: 0px;
   font-size: .7em;
@@ -111,6 +117,19 @@ h1 {
 .finishedplates {
   border-top: solid lightgrey 1px;
 }
+
+.modalbg {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: lightyellow;
+    opacity: .7;
+    z-index: 1;
+    transition: .3s;
+}
+
 .modal {
   position: fixed;
   background: white;
@@ -133,6 +152,22 @@ h1 {
     margin: 10px;
 }
 
+.cleanplates {
+  padding: 5px 10px 5px 10px;
+  border-radius: 10px;
+  border: 1px solid lightgrey;
+    transition: .3s;
+    width: max-content;
+}
+
+.cleanplates:hover {
+  cursor: pointer;
+  border: 1px solid pink;
+  box-shadow: 0 2px 2px 0 lightgrey;
+  background-color: pink;
+  transition: .5s;
+}
+
 /* individual platesContain */
 
 .platetext {
@@ -141,7 +176,7 @@ h1 {
   color: black;
   padding: 11px;
   width: max-content;
-  border-radius: 5px;
+  border-radius: 20px;
   padding-top: 14px;
   word-wrap: break-word;
   max-width: calc(100% - 60px);
@@ -189,7 +224,8 @@ h1 {
   display:inline-block;
   transition: background .5s;
   padding: 12px;
-  border-radius: 5px;
+  border: 1px solid white;
+  border-radius: 15px;
 }
 
  [contenteditable]:focus {
@@ -206,7 +242,6 @@ h1 {
    padding: 12px;
    border: 1px solid #f7f2f2;
    cursor: text;
-   border-radius: 5px;
 }
 
  [contenteditable]:hover {
@@ -215,11 +250,51 @@ h1 {
     padding: 12px;
     border: 1px solid #f7f2f2;
     cursor: text;
-    border-radius: 5px;
 }
 
 [contenteditable=true]:empty:before {
   content: attr(placeholder);
   display: block;
   color: lightgrey;
+}
+
+@media only screen and (max-width: 600px) {
+
+.App {
+    padding: 30px 30px 30px 15px;
+}
+
+.info {
+  bottom: 30px;
+  right: 30px;
+}
+
+.mainbuttons {
+  right: 30px;
+}
+
+.theplates {
+  margin-left: 25px;
+}
+
+.page{
+  width: calc(90%);
+}
+
+.modal {
+  left: 10px;
+  right: 10px;
+  top: 10px;
+  bottom: 10px;
+  width: auto;
+}
+
+.platetext {
+  font-size: 1.2em;
+}
+
+.platebox {
+  margin: 10px 3px 10px 10px;
+}
+
 }

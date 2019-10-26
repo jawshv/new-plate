@@ -1,5 +1,4 @@
 import React, { Component, useState } from 'react';
-import './App.css';
 
 class Buttons extends Component {
 
